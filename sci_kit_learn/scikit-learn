@@ -72,6 +72,32 @@
                 from sklearn.preprocessing import PolynomialFeatures 导入有多现实特征的处理器
                 from sklearn.linear_model import LinearRegression 导入简单线性回归模型
                 from sklearn.pipeline import make_pipeline 管道命令
+                影响模型效果的两个因素：模型复杂度，训练数据集规模 
+            学习曲线（learning curve）:训练得分，验证得分 学习曲线的特征： 
+                1.特定复杂度的模型对较小的数据集容易过拟合，既此时训练的分高，验证得分低。 
+                2.特定复杂度的模型对较大的数据集容易欠拟合，既随着数据集的增大，训练的分会不断降低，而验证的分会不断提高。 
+                3.模型的验证集的得分永远不会高于训练集的得分，即两条曲线一直在靠近,但永远不会较差。 
+                学习曲线的最重要特征： 随着训练样本的增加，分数会收敛到特定值。（如果你的数据多到使模型得分收敛，那么增加训练样本无济于事， 改善模型性能的唯一方法就是换模型，通常是换成更复杂的模型）。 
+            验证实践: 三维网格中寻找最优值：多相似次数的搜索范围、回归模型是否拟合截距、模型是否需要标准化处理。 
+            from sklearn.model_selection import GridSearchCV 
+四、特征工程（feature engineering）: 特征工程：（将任意格式数据转换成具有良好特征的向量形式）找到与问题有关的任何信息，把它们转换成特征矩阵的数值。如：表示分类数据的特征、表示文本特征、表示图像特征、高模型复杂的的衍生特征、处理缺失数据。该过程也称向量化。 
+    1.分类特征：非数值型数据类型是分类数据。 独热编码:增加额外的列，让0,1出现的对应的列分别表示每个分类值有或无。 
+        from sklearn.feature_extraction import DictVectorizer 
+        vec = DictVectorizer(sparse=False, dtype=int)
+        sparse=False表示增加列，以0,1的出现与否表示每个分类有/无 
+        sparse=True 表示用稀疏矩阵表示 vec.fit_transform(data) 
+        分类特征工具： 
+            sklearn.feature_extracton.DictVectorizer 
+            sklearn.preprocessing.OneHotEncoder 
+            sklearn.feature_extraction.FeatureHasher 
+    2.文本特征: 单词统计是最常见的方法（统计每个单词出现的次数，放入表格中）。 
+        from sklearn.feature_extraction.text import CountVectorizer 
+        import pandas as pd vec=CountVectorizer() 
+        X=vec.fit_transform(sample) 
+        pd.DataFrame(X.toarray(),columns=vec.get_feature_names()) 
+        这样就得到了没个单词出现次数的DataFrame 但是该方法的缺点是：原始单词统计会让一些常用词（如is）聚集太高权重，在分类算法中这样并不合理，解决该问题可以用TF-IDF（term frequency-inverse document frequency，词频逆文档频率，其大小与一个词的常见成都成反比）,通过单词在文档中出现的频率来衡量其权重。 
+    3.图像特征：通过Scikit-Image模块来实现http://scikit-image.org 
+    4.衍生特征：输入特征经过数学变换衍生出来的新特征。（基函数的回归（basis function regression）：将线性回归转换成多项式回归时，并不是通过改变模型，而是通过改变输入数据）。不改变模型，而是改变输出来改善模型效果--核方法（kernel method）
                 
 
                 
