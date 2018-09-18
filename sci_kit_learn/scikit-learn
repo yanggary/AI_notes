@@ -1,0 +1,81 @@
+一、机器学习：借助数学模型理解数据。学习过程即为调整参数让模型拟合得到的统计数据。
+    分类：监督学习（supervised learning），无监督学习(unsupervised learning)，半监督学习(semi-supervised learning)
+    监督学习（supervised learning）:对数据的若干特征和标签（类型）之间的关联性进行建模的过程。
+        分类（classification）：标签（分类）是离散值，预测分类即定性分析。
+        回归（regression）：标签是连续值，预测值即定量分析。
+    无监督学习（unsupervised learning）:无标签建模，数据自我介绍的过程。
+        聚类（clustering）:将数据分组。
+        降维（dimensionality reduction）:让数据更简洁。
+    半监督学习（semi-supervised learning）:数据标签不完整。
+二、Scikit-learn
+    1.数据表示（data Representation）:
+        数据表--->特征矩阵（features matrix）--->目标（标签）数组（target array）
+    2.API
+    特点：
+        统一性：所有对象共同连接一组方法和统一文档。
+        内省：所有参数都是公共属性。
+        限制对象层级：只有算法可以用类表示，数据集都是标准数据集表示（numpy数组、pandas dataframe、scipy稀疏矩阵）表示，参数名都是标准python字符串
+        函数组合：很多任务都可以用一串基本算法实现。
+        明智的默认值：当需要用户设置参数时sklearn预先定义了适当的默认值。
+    常用步骤:
+        （1）从Scikit-learn中导入适当的评估类，选择模型类。
+        （2）用合适的数值对模型类进行实例化，配置模型超参数（hyperparameter）。
+        （3）整理数据，通过前面介绍的方法获取特征矩阵和目标数组。
+        （4）调用模型实例的fit()方法对数据进行拟合。
+        （5）对新数据应用模型。
+            监督学习：使用predict()方法预测新数据的标签。
+            无监督学习：使用transform()或predict()方法转换或推断数据的性质。
+三、超参选择和模型验证
+    模型选择和超参选择是有效使用各种机器学习工具和技术的最重要阶段。我们需要一种方式来验证选中的模型和参数是否可以很好的拟合数据。
+    1.模型验证（model validation）：选择模型和超参后，用训练数据进行学习，对比模型对一直数据的预测值和实际值的差异。
+        错误方法：简单存储数据，然后把新数据于存储的一直数据进行对比来预测标签。
+        正确方法：
+            留出集（holdout set）:sklearn.model_selection.train_test_split()
+                缺点：模型失去了一部分训练机会。
+            交叉验证（cross validation）：将数据分成若干子集，依次选取每个子集作为验证集。
+                1.n轮交叉验证
+                from sklearn.model_selection import cross_val_score
+                cross_val_score(model,X,y,cv=5)表示5轮交叉验证
+                2.留一法（leave one out）:交叉验证的极端情况，每次留一个样本做验证。
+                from sklearn.model_selection import LeaveOneOut
+                scores = cross_val_score(model,X,y,cv=LeaveOneOut(len(x)))
+                scores.mean()：均值可以反映模型的准确性。
+    2.选择最优模型
+        问题的答案往往与直觉相悖。
+        改善模型能力的高低是决定机器学习实践者是否成功的标志
+        1.偏差与方差的均衡：找出偏差（bias）与方差（variance）的均衡点。
+            偏差（bias）:模型没有足够的灵活性来适应数据所有特征，就成为欠拟合，也称高偏差。
+            方差（variance）:模型过于灵活，适应数据所有特征时也适应了随机误差，成为过拟合，也称高方差。
+            R²（coefficient of determination）:判定系数
+            R²=1 表示模型数据完全吻合
+            R²=0 表示模型不比简单取均值更好。
+            R²<0 表示模型性能很差
+            对于高偏差模型，模型在验证集的表现与训练集的表现类似。
+            对于高方差模型，模型在验证集的表现远远不如在训练集的表现。
+            原理：
+                total sum of squares  explained sum of squares   residual sum of squares
+                R²=1-residual sum of squares/total sum of squares
+                R²=1-（真实标签-预测标签）²/（真实标签-真实标签均值）²
+                R²=1-偏差/方差
+                偏差/方差  服从F分布
+                正态总体平法和服从X方分布
+            验证曲线：横轴：模型复杂度 纵轴：模型得分  训练的分和测试得分曲线
+                特征：
+                1.训练得分肯定高于验证得分。
+                2.使用低复杂度（高偏差）的模型时，训练数据往往欠拟合，既模型对训练数据和测试数据都缺乏预测能力。
+                3.使用高复杂度（高方差）模型时，训练数据往往过拟合，说明模型对训练数据预测能力强，对新数据预测能力差。
+                4.使用复杂度适中的模型时，验证曲线得分最高。说明在该复杂度条件下偏差和方差达到均衡点。
+            Scikit-learn验证曲线：
+                多项式回归模型：
+                    1次：y=ax+b
+                    2次：y=ax**2+bx+c
+                from sklearn.preprocessing import PolynomialFeatures 导入有多现实特征的处理器
+                from sklearn.linear_model import LinearRegression 导入简单线性回归模型
+                from sklearn.pipeline import make_pipeline 管道命令
+                
+
+                
+                
+            
+    
+    
