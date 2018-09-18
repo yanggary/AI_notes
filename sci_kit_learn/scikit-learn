@@ -98,10 +98,60 @@
         这样就得到了没个单词出现次数的DataFrame 但是该方法的缺点是：原始单词统计会让一些常用词（如is）聚集太高权重，在分类算法中这样并不合理，解决该问题可以用TF-IDF（term frequency-inverse document frequency，词频逆文档频率，其大小与一个词的常见成都成反比）,通过单词在文档中出现的频率来衡量其权重。 
     3.图像特征：通过Scikit-Image模块来实现http://scikit-image.org 
     4.衍生特征：输入特征经过数学变换衍生出来的新特征。（基函数的回归（basis function regression）：将线性回归转换成多项式回归时，并不是通过改变模型，而是通过改变输入数据）。不改变模型，而是改变输出来改善模型效果--核方法（kernel method）
-                
+    5.缺失值填充：简单（列均值，中位数，众数），复杂（矩阵填充，模型处理）
+        sklearn的Imputer可以实现一般的填充（均值、中位数、众数）
+        from sklearn.preprocessing import Imputer
+        imp=Imputer(strategy='mean')
+        X2=imp.fit_transform(X)
+    6.特征管道：
+        如要实现以下三个操作：均值填充缺失，衍生特征转换为2次方，拟合线性回归模型。则可用管道操作。
+        from sklearn.pipeline import make_pipeline
+        model=make_pipeline(Imputer(strategy='mean'),PolynomialFeatures(degree=2),LinearRegression())
+        合并三步为一步。
+五、朴素贝叶斯分类（navie bayes classifier）：属于简单分类算法，通常适用于维度较高的数据集。
+    1.特征：运行速度快，可调参数少。（快速、粗糙的解决方案）
+        朴素：对每种标签的生成模型进行简单假设，就能找到每种类型生成模型的近似解，然后就可以使用贝叶斯分裂
+        贝叶斯定理（Bayes's theorem）：描述统计量的条件概率公式，其成立的前提是：每种特征两两相互独立。
+            P（L|特征）=P（特征|L）P（L）/P（特征）
+            一种方法是标签对应后验概率的比值：P（L1|特征）/P（L2|特征）=P（特征|L1）P（L1）/P（特征|L2）P（L2）
+            生成模型：计算每个标签的P（特征|Li）
+            为每种标签设置生成模型是朴素贝叶斯分裂器训练的主要过程。
+    2.高斯朴素贝叶斯（Gaussian naive Bayes）:假设每个标签的数据都服从简单的高斯分布。
+        假设数据服从高斯分布且无协方差（no covariance，既相互独立），只要找出每个标签的所有样本点的均值和标准差再定义一个高斯分布，就可以拟合模型了。
+        sklearn.datasets.make_blobs(n_samples=100, n_features=2, centers=3, cluster_std=1.0, center_box=(-10.0, 10.0), shuffle=True, random_state=None)
+        returns:
+            X : array of shape [n_samples, n_features] :The generated samples. 生成的样本数据集。 
+            y : array of shape [n_samples] : The integer labels for cluster membership of each sample. 样本数据集的标签。
+        parameters:
+            n_samples: int, optional (default=100) :The total number of points equally divided among clusters. 
+    待生成的样本的总数。
+            n_features: int, optional (default=2) :The number of features for each sample.每个样本的特征数。 
+            centers: int or array of shape [n_centers, n_features], optional (default=3) :The number of centers to generate, or the fixed center locations. 要生成的样本中心（类别）数，或者是确定的中心点。 
+            cluster_std: float or sequence of floats, optional (default=1.0) :The standard deviation of the clusters.每个类别的方差，例如我们希望生成2类数据，其中一类比另一类具有更大的方差，可以将cluster_std设置为[1.0,3.0]。 
+            center_box: pair of floats (min, max), optional (default=(-10.0, 10.0)) :The bounding box for each cluster center when centers are generated at random. 
+            shuffle: boolean, optional (default=True) :Shuffle the samples. 打乱样本。
+            random_state: int, RandomState instance or None, optional (default=None) :相当于random中的seed
+        通过每种类型的生成模型，计算出任意数据点的似然估计P（特征|Li），然后根据贝叶斯定理计算出后延概率比值P（L1|特征）/P（L2|特征）=P（特征|L1）P（L1）/P（特征|L2）P（L2），而P（L1）和P（L2）很容易得到，从而确定每个数据点的最大可能标签。该步骤在sklearn.naive_bayes.GaussianNB评估器中实现
+        from sklearn.navie_bayes import GaussianNB
+        其模型对象的属性（attributions）:
+        priors属性：获取各个类标签对应的先验概率
+        class_prior_属性：同priors一样，都是获取各个类标记对应的先验概率，区别在于priors属性返回列表，class_prior_返回的是数组
+        class_count_属性：获取各类标记对应的训练样本数
+        theta_属性：获取各个类标记在各个特征上的均值
+        sigma_属性：获取各个类标记在各个特征上的方差
+        get_params(deep=True)：返回priors与其参数值组成字典
+        set_params(**params)：设置估计器priors参数
+        fit(X, y, sample_weight=None)：训练样本，X表示特征向量，y类标记，sample_weight表各样本权重数组
+        partial_fit(X, y, classes=None, sample_weight=None)：增量式训练，当训练数据集数据量非常大，不能一次性全部载入内存时，可以将数据集划分若干份，重复调用partial_fit在线学习模型参数，在第一次调用partial_fit函数时，必须制定classes参数[1,2]表示有1和2两个分类，在随后的调用可以忽略。
+        predict(X)：直接输出测试集预测的类标记
+        predict_proba(X)：输出测试样本在各个类标记预测概率值
+        predict_log_proba(X)：输出测试样本在各个类标记上预测概率值对应对数值
+        score(X, y, sample_weight=None)：返回测试样本映射到指定类标记上的得分(准确率)
+        多项式贝叶斯sklearn.naive_bayes.MultinomialNB后续可学习！！！！
+        
 
-                
-                
+
+
             
     
     
