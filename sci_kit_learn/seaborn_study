@@ -1,0 +1,24 @@
+set_style( )是用来设置主题的，Seaborn有五个预设好的主题： darkgrid , whitegrid , dark , white ,和 ticks  默认： darkgrid
+set( )通过设置参数可以用来设置背景，调色板等，更加常用。
+distplot( )为(直方图)hist加强版。
+kdeplot( )为密度曲线图 。
+boxplot( )箱形图。
+jointplot( )联合分布。
+heatmap( )热点图
+    seaborn.heatmap(data, vmin=None, vmax=None, cmap=None, center=None, robust=False, annot=None, fmt='.2g', annotkws=None, linewidths=0, linecolor='white', cbar=True, cbarkws=None, cbar_ax=None, square=False, ax=None, xticklabels=True, yticklabels=True, mask=None, **kwargs)
+    data：矩阵数据集，可以使numpy的数组（array），如果是pandas的dataframe，则df的index/column信息会分别对应到heatmap的columns和rows。
+    linewidths,热力图矩阵之间的间隔大小。
+    vmax,vmin, 图例中最大值和最小值的显示值，没有该参数时默认不显示。
+    cmap：matplotlib的colormap名称或颜色对象；如果没有提供，默认为cubehelix map (数据集为连续数据集时) 或 RdBu_r (数据集为离散数据集时)
+    center:将数据设置为图例中的均值数据，即图例中心的数据值；通过设置center值，可以调整生成的图像颜色的整体深浅；设置center数据时，如果有数据溢出，则手动设置的vmax、vmin会自动改变。
+    robust：
+    mask：
+    xticklabels: 如果是True，则绘制dataframe的列名。如果是False，则不绘制列名。如果是列表，则绘制列表中的内容作为xticklabels。 如果是整数n，则绘制列名，但每个n绘制一个label。 默认为True。
+    yticklabels: 如果是True，则绘制dataframe的行名。如果是False，则不绘制行名。如果是列表，则绘制列表中的内容作为yticklabels。 如果是整数n，则绘制列名，但每个n绘制一个label。 默认为True。默认为True。
+    annot,annotate(注释)的缩写，annot默认为False，当annot为True时，在heatmap中每个方格写入数据。
+    annot_kws，当annot为True时，可设置各个参数，包括大小，颜色，加粗，斜体字等
+    fmt，格式设置
+    squre:默认False,为True时表示设置图为正方形。
+    cbar:默认False,为True时表示显示右侧色条。
+
+scatter( )散点图

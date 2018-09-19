@@ -1,0 +1,1 @@
+np.dot(x,y)、x.dot(y)、y.dot(x)将矩阵x(m,n)和矩阵y(n,m)相乘
