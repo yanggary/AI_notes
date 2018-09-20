@@ -272,6 +272,11 @@
     基函数：对原始数据进行变换，将线性回归模型转化为非线性回归模型。
     y=a0+a1x+a2x**2+......该模型仍然是线性模型，也就是说稀疏an并不会彼此相乘或者相除。我们其实将一维的x投影到了高位空间，因此通过线性模型即可拟合出x和y的关系。
     高斯基函数：sklearn并没有内置高斯基函数
+    虽然线性回归引入基函数会让模型变得更加灵活，但是也很容易造成过拟合。
+    正则化：当基函数重叠的时候，通常就表明出现了过拟合：相邻基函数的系数相互抵消，这显然是有问题的，如果对较大的模型参数进行惩罚（penalize）,从而抑制模型剧烈波动，应该就可以解决这个问题了，这个惩罚机制被称为正则化（regularization）。
+    岭回归（L2范数正则化）：正则化最常见的形式是岭回归（ridge regression）,又称L2范数正则化，又称吉洪诺夫正则化（Tikhonov regularization）。其处理方法是对模型系数平方和（L2范数）进行惩罚，模型拟合的惩罚项为：P=alpha*sum(系数平方）。alpha是一个自由参数用来控制惩罚力度。参数alpha时控制最终复杂度的关键，如果alpha>>0模型就恢复到标准线性回归结果，如果alpha>>正无穷，那么所有模型响应都会被压制。岭回归的一个重要优点是，它可以非常高效的计算——因此相比原始的线性回归模型，几乎没有消耗更多的计算机资源。
+    Lasso正则化（L1范数）：其处理方法是对模型系数绝对值的和（L1范数）进行惩罚，P=alpha*sum(系数绝对值）。由于其几何特性，Lasso正则化倾向于构建稀疏模型，也就是说，它更喜欢将模型稀疏设为0。
+    
     知识点1.
         sklearn.linear_model.LinearRegression(fit_intercept=True, normalize=False,copy_X=True, n_jobs=1)
             parameters:
@@ -289,6 +294,39 @@
             degree：控制多项式的维度
             interaction_only： 默认为False，如果指定为True，那么就不会有特征自己和自己结合的项，二次项中没有x^2和y^2（1,x,y,x^2,xy, y^2）。
             include_bias：默认为True。如果为True的话，那么就会有上面的1那一项。
+            
+    知识点3：sklearn.linear_model.Ridge(alpha):
+        alpha为惩罚系数，用来控制惩罚力度。
+
+
+七、支持向量机（support vector machine, SVM）
+    SVM是非常强大的有监督学习算法，既可以用于分类也可以用于回归。
+    生成分类法：先对每个类进行了随机分布的假设，然后用生成的模型估计新数据点的标签。
+    判别分类法：不为每类数据建模，而是用一条分割线（二维空间中的直线或曲线）或者流行体（多维空间中的曲线、曲面等概念的推广）将各种类型分隔开。
+    
+    
+    知识点1.
+        sklearn.svm.SVC(C=1.0, kernel='rbf', degree=3, gamma='auto', coef0=0.0, shrinking=True, probability=False,tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=-1, decision_function_shape=None,random_state=None)
+        parameters:
+            C：C-SVC的惩罚参数C默认值是1.0，c-->0则对分类失误的惩罚越大，对训练集的测试准确率高，但泛化能力强，c越大对误分类的惩罚减小，允许容错，将他们当成噪声点，泛化能力较强。
+            kernel ：核函数，默认是rbf，可以是‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ 
+                线性：u'v
+                多项式：(gamma*u'*v + coef0)^degree
+                RBF函数：exp(-gamma|u-v|^2)
+                sigmoid：tanh(gamma*u'*v + coef0)
+            degree ：多项式poly函数的维度，默认是3，选择其他核函数时会被忽略。
+            gamma ： ‘rbf’,‘poly’ 和‘sigmoid’的核函数参数。默认是’auto’，则会选择1/n_features
+            coef0 ：核函数的常数项。对于‘poly’和 ‘sigmoid’有用。
+            class_weight ：类别的权重，字典形式传递。设置第几类的参数C为weight*C(C-SVC中的C)。
+        属性：
+            model.decision_function([a,b])：计算某个点到决策平面的函数距离。
+                函数距离：？？？
+
+        
+        
+        
+
+
             
             
 
