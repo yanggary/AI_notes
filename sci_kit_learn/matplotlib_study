@@ -34,6 +34,13 @@
 
 matplotlib.pyplot.fill_between(x, y - d, y + d, edgecolor='none', color='#AAAAAA',alpha=0.4)
     对两条线之间进行填充
-ax=plt.gca():get current axes，获取坐标轴。
-ax.contour(X,Y,P,colors='k',levels=[-1,0,1],alpha=0.5,linestyles=['--','-','--']):获得（X,Y,P）的超平面，P为各个点到超平面的函数距离
     
+ax=plt.gca():get current axes，获取坐标轴。
+
+ax.contour(X,Y,P,colors='k',levels=[-1,0,1],alpha=0.5,linestyles=['--','-','--']):获得（X,Y,P）的超平面，P为各个点到超平面的函数距离
+
+ax.contourf(X,Y,P,colors='k',levels=[-1,0,1],alpha=0.5,linestyles=['--','-','--']):获得（X,Y,P）的超平面，P为各个点到超平面的函数距离,加f表示填充
+
+from mpl_toolkits.mplot3d import axes3d可以闯将3D坐标
+
+axes是创建坐标轴，axis是设定其范围  

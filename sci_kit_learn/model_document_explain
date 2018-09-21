@@ -1,0 +1,218 @@
+一、sklearn.feature_extraction常用API介绍
+        1.特征提取：sklearn.feature_extraction.DictVectorizer(dtype=<class 'numpy.float64'>,separator='=',sparse=True,sort=True)
+            将<特征-值>映射转化为向量。字典类型的对象转化为numpy.array或者scipy.sparse特征值为string类型时，向量表示为one-hot二元编码，出现的string为1，其余为0.特征值为int等数字类型时，对应的值为相应的数字
+            参数：
+                dtype:特征值的类型。
+                separator:可选，string。当特征值为string时，用来连接特征名称和值的符号，默认为'='。例，当特征名为'f',而特征值含有'pam'和'spam'时，one-hot对应的向量名为'f=pam'和'f=spam'
+                sparse:boolean,可选。默认为True,转换过程中生成一个scipy.sparse矩阵。当数据多表示为one-hot类型时，占用内存过大，稀疏表示可以节约大量空间。
+                sort:boolean,可选，默认为True。转化完成后对feature_names_和vocabulary_按字典序排列。
+            属性：
+                feature_names_:长度为n_features的列表，含有所有特征名称.
+                vocabulary_:字典类型，特征名映射到特征在list中的index的字典对象
+            方法：
+                fit(X,y=None):学习一个将特征名称映射到索引的列表，返回值是其自身(DictVectorizer)。
+                fit_transform(X,y=None):学习一个将特征名称映射到索引的列表，返回值是为对应的特征向量，一般2维等价于fit(X).transform(X)。
+                get_feature_names():返回一个含有特征名称的列表，通过索引排序，如果含有one-hot表示的特征，则显示相应的特征名。
+                get_params(deep=True):返回模型的参数（string到任何类型的映射）。
+                inverse_transform(X,dict_type=<class 'dict'>):将转化好的特征向量恢复到转化之前的表示状态。X必须是通过transform或者fit_transform生成的向量。
+                restrict(support,indices=False):对支持使用特征选择的模型进行特征限制，例如只选择前几个特征，support:矩阵类型，boolean或者索引列表，一般是feature selectors.get_support()的返回值。indices:boolean，可选，表示support是不是索引的列表返回值是其自身(DictVectorizer)
+                set_params(**params):设置DictVectorizer的参数。
+                transform(X):学习一个将特征名称映射到索引的列表，返回值是为对应的特征向量，一般2维。
+        2.sklearn.feature_extraction.FeatureHasher(n_features=1048576,input_type='dict',dytpe<float64>,alternate_sign=True,non_negative=False)：采用哈希方法将象征性的特征序列转化为scipy.sparse矩阵，可以节约时间和空间。
+        3.sklearn.feature_extraction.text.CountVectorizer(input='content',encoding='utf-8',decode_error='strict',strip_accents=None,lowercase=True,preprocessor=None,tokenizer=None,stop_words=None,token_pattern='(?u)\b\w\w+\b',ngram_range=(1,1),analyzer='word',max_df=1.0,min_df=1,max_features=None,vocabulary=None,binary=False,dtype=<'numpy.int64'>):
+        CountVectorizer:返回的出现次数的稀疏矩阵，TfidfTransformer：返回频率逆序文档频率归一化的发生次数矩阵（term frequency-inverse document frequency，词频逆文档频率，其大小与一个词的常见程度成反比）。参数属性方法基本相同。
+        参数：
+            input：string {‘filename’, ‘file’, ‘content’}：if filename，输入的是要解析的文件序列，if file,可读文件，if content,字符串或字节项。
+            encoding : string, ‘utf-8’ by default.
+            decode_error : {‘strict’, ‘ignore’, ‘replace’}：遇到不能识别的字符时的处理方式，默认的是strict，意思是如果解码错误就汇报。其他的可选值为ignore’ 和‘replace’。
+            strip_accents : {‘ascii’, ‘unicode’, None}：去掉口音（这里我觉得应该是‘特殊字符’），ascii是一个对字符进行快速映射的方法。unicode是一种较慢的方法，但是可以对任何字符使用。
+            analyzer : string, {‘word’, ‘char’, ‘char_wb’} or callable：特征是否应该转化为单词或者n-grams（一种简化单词的方式，可以将注入book和books综合成一个单次），选项‘char_wb’仅将文档中的单词表示成为n-grams的形式），如果一个用来提取特征的可调用函数，被传递进来，那么就按照被传递的函数进行处理）。
+            preprocessor : callable or None (default)：改写预测处理的函数，同时保留标记和n-grams的处理过程。
+            tokenizer : callable or None (default)：改写字符串标记步骤，同时保留预处理和n-grams的步骤。
+            ngram_range : tuple (min_n, max_n)：对于不同的n-grams的提取，n-value变化的上界和下界，所有的min_n <= n <= max_n 的n值都会被使用
+            stop_words : string {‘english’}, list, or None (default)：如果是字符串，那么它将被传递给_check_stop_list，并且返回停用列表，现在只支持英文的停用词列表，如果是列表，那么这个列表将被认为包含了停用词，这些词将被从文档中的单词删除掉，如果是none，那么就不使用停用词，max_df可以被设置成在[0.7，1.0]之间的值，来自动的检测和过滤掉基于其语料库的停用词。
+            lowercase : boolean, default True：全部改成小写。
+            token_pattern : string：构成token的正则表达式，它仅仅在tokenize == ‘word’的时候才使用。默认的正则表达式是选择两个或者两个以上的字符（标点符号是被忽略的，仅仅当作token的分割符）
+            max_df : float in range [0.0, 1.0] or int, optional, 1.0 by default：当构建字典的时候，忽略词频明显高于给的那个的阈值（语料库的停用词），如果是浮点数，那么参数代表了一个文档的比例，当是整数的时候，代表的是计数值。当字典不是none的时候，这个参数会被忽略。
+            min_df : float in range [0.0, 1.0] or int, optional, 1 by default：当构建忽略词的字典的时候，这些忽略词要求要严格的低于给定的阈值。这个值在书中称之为截至值，如果是浮点数，那么代表的是文档中的比例，如果是整数那么就是绝对计数值。如果字典不是空的话，这个参数被忽略。
+            max_features : optional, None by default：如果不是none，构建词典的时候仅仅考虑语料库里词频最高的那些特征，如果词典非空，那么这个参数被忽略。
+            vocabulary : Mapping or iterable, optional：是以词为键，并且值可以在特征矩阵里可以索引的，或者是一个单词的迭代（译注：这里不是很清楚是什么意思），如果词典不是给定的，那么将会从输入的文档库中选择。
+            binary : boolean, False by default.：如果是真，那么所有非零的计数将被设置成1。这对于离散的只针对二值事件而非整数计数的概率模型很有用。
+            dtype : type, optional：通过fit_transform或者transform处理后返回的矩阵类型。
+        方法：
+            build_analyzer（）返回处理预处理和标记化的可调用
+            build_preprocessor（）返回一个函数，以便在标记化之前对文本进行预处理
+            build_tokenizer（）返回一个将字符串分成令牌序列的函数
+            decode（DOC）将输入解码为一串Unicode码元
+            fit（raw_documents [，y]）从训练集学习词汇和idf。
+            fit_transform（raw_documents [，y]）学习词汇和idf，返回术语文档矩阵。
+            get_feature_names（）从特征整数索引到特征名称的数组映射
+            get_params（[deep]）获取此估计器的参数。
+            get_stop_words（）构建或获取有效的停止词列表
+            inverse_transform（X）每个文档在X中返回非零条目的条款。
+            set_params（** PARAMS）设置该估计器的参数。
+            transform（raw_documents [，copy]）将文档转换为文档术语矩阵。
+                 
+        4.sklearn.feature_extraction.image.PatchExtractor（patch_size=None,max_patches=None,random_state=None）
+            transform(X):将图片样本X转化为小块数据矩阵。X : array, shape = (n_samples, image_height, image_width) or(n_samples, image_height, image_width, n_channels)
+            返回值：patches : array, shape = (n_patches, patch_height, patch_width) or(n_patches, patch_height, patch_width, n_channels)
+
+
+sklearn.datasets.make_blobs(n_samples=100, n_features=2, centers=3, cluster_std=1.0, center_box=(-10.0, 10.0), shuffle=True, random_state=None)
+        返回值（returns）:
+            X : array of shape [n_samples, n_features] :The generated samples. 生成的样本数据集。 
+            y : array of shape [n_samples] : The integer labels for cluster membership of each sample. 样本数据集的标签。
+        parameters:
+            n_samples: int, optional (default=100) :The total number of points equally divided among clusters. 
+    待生成的样本的总数。
+            n_features: int, optional (default=2) :The number of features for each sample.每个样本的特征数。 
+            centers: int or array of shape [n_centers, n_features], optional (default=3) :The number of centers to generate, or the fixed center locations. 要生成的样本中心（类别）数，或者是确定的中心点。 
+            cluster_std: float or sequence of floats, optional (default=1.0) :The standard deviation of the clusters.每个类别的方差，例如我们希望生成2类数据，其中一类比另一类具有更大的方差，可以将cluster_std设置为[1.0,3.0]。 
+            center_box: pair of floats (min, max), optional (default=(-10.0, 10.0)) :The bounding box for each cluster center when centers are generated at random. 
+            shuffle: boolean, optional (default=True) :Shuffle the samples. 打乱样本。
+            random_state: int, RandomState instance or None, optional (default=None) :相当于random中的seed
+
+
+from sklearn.navie_bayes import GaussianNB
+        parameters:
+            priors : array-like, shape (n_classes,),Prior probabilities of the classes. If specified the priors are not adjusted according to the data.
+        其模型对象的属性（attributions）:
+            priors属性：获取各个类标签对应的先验概率
+            class_prior_属性：同priors一样，都是获取各个类标记对应的先验概率，区别在于priors属性返回列表，class_prior_返回的是数组
+            class_count_属性：获取各类标记对应的训练样本数
+            theta_属性：获取各个类标记在各个特征上的均值
+            sigma_属性：获取各个类标记在各个特征上的方差
+        方法（method）:
+            get_params(deep=True)：返回priors与其参数值组成字典
+            set_params(**params)：设置估计器priors参数
+            fit(X, y, sample_weight=None)：训练样本，X表示特征向量，y类标记，sample_weight表各样本权重数组
+            partial_fit(X, y, classes=None, sample_weight=None)：增量式训练，当训练数据集数据量非常大，不能一次性全部载入内存时，可以将数据集划分若干份，重复调用partial_fit在线学习模型参数，在第一次调用partial_fit函数时，必须制定classes参数[1,2]表示有1和2两个分类，在随后的调用可以忽略。
+            predict(X)：直接输出测试集预测的类标记
+            predict_proba(X)：输出测试样本在各个类标记预测概率值,predict_proba(X).round(2)表示结果保留2位小数。
+            predict_log_proba(X)：输出测试样本在各个类标记上预测概率值对应对数值
+            score(X, y, sample_weight=None)：返回测试样本映射到指定类标记上的得分(准确率)
+
+
+sklearn.naive_bayes.MultinomialNB(alpha=1.0, fit_prior=True, class_prior=None) 
+        parameters:
+            alpha：浮点型，可选项，默认1.0，添加拉普拉修/Lidstone平滑参数
+            fit_prior：布尔型，可选项，默认True，表示是否学习先验概率，参数为False表示所有类标记具有相同的先验概率
+            class_prior：类似数组，数组大小为(n_classes,)，默认None，类先验概率
+        训练后的attributions:
+            class_log_prior_：各类标记的平滑先验概率对数值，其取值会受fit_prior和class_prior参数的影响
+                a、若指定了class_prior参数，不管fit_prior为True或False，class_log_prior_取值是class_prior转换成log后的结果
+                b、若fit_prior参数为False，class_prior=None，则各类标记的先验概率相同等于类标记总个数N分之一
+                c、若fit_prior参数为True，class_prior=None，则各类标记的先验概率相同等于各类标记个数除以各类标记个数之和
+            intercept_：将多项式朴素贝叶斯解释的class_log_prior_映射为线性模型，其值和class_log_propr相同
+            feature_log_prob_：指定类的各特征概率(条件概率)对数值，返回形状为(n_classes, n_features)数组
+            特征的条件概率=（指定类下指定特征出现的次数+alpha）/（指定类下所有特征出现次数之和+类的可能取值个数*alpha）
+            coef_：将多项式朴素贝叶斯解释feature_log_prob_映射成线性模型，其值和feature_log_prob相同
+            class_count_：训练样本中各类别对应的样本数，按类的顺序排序输出
+            feature_count_：各类别各个特征出现的次数，返回形状为(n_classes, n_features)数组
+        方法（method）:
+            fit(X, y, sample_weight=None)：根据X、y训练模型
+            get_params(deep=True)：获取分类器的参数，以各参数字典形式返回
+            partial_fit(X, y, classes=None, sample_weight=None)：对于数据量大时，提供增量式训练，在线学习模型参数，参数X可以是类似数组或稀疏矩阵，在第一次调用函数，必须制定classes参数，随后调用时可以忽略。
+            predict(X)：在测试集X上预测，输出X对应目标值
+            predict_log_proba(X)：测试样本划分到各个类的概率对数值
+            predict_proba(X)：输出测试样本划分到各个类别的概率值
+            score(X, y, sample_weight=None)：输出对测试样本的预测准确率的平均值
+            set_params(**params)：设置估计器的参数
+            
+sklearn.metrics.confusion_matrix(y_true, y_pred, labels=None, sample_weight=None)
+            y_true: 是样本真实分类结果，
+            y_pred: 是样本预测分类结果 
+            labels：是所给出的类别，通过这个可对类别进行选择 
+            sample_weight : 样本权重
+
+sklearn.linear_model.LinearRegression(fit_intercept=True, normalize=False,copy_X=True, n_jobs=1)
+            parameters:
+                fit_intercept：布尔型，默认为True，若参数值为True时，代表训练模型需要加一个截距项；若参数为False时，代表模型无需加截距项。
+                normalize：布尔型，默认为False，若fit_intercept参数设置False时，normalize参数无需设置；若normalize设置为True时，则输入的样本数据(X-X均值)/||X||；若设置normalize=False时，在训练模型前， 可以使用sklearn.preprocessing.StandardScaler进行标准化处理。
+            attributions:
+                coef_：回归系数(斜率)
+                intercept_：截距项
+            method:
+                fit(X, y, sample_weight=None)
+                predict(X)
+                score(X, y, sample_weight=None)，其结果等于1-(((y_true - y_pred) **2).sum() / ((y_true - y_true.mean()) ** 2).sum())
+                
+
+sklearn.preprocessing.PolynomialFeatures()
+            degree：控制多项式的维度
+            interaction_only： 默认为False，如果指定为True，那么就不会有特征自己和自己结合的项，二次项中没有x^2和y^2（1,x,y,x^2,xy, y^2）。
+            include_bias：默认为True。如果为True的话，那么就会有上面的1那一项。
+            
+
+sklearn.linear_model.Ridge(alpha):
+        alpha为惩罚系数，用来控制惩罚力度。
+        
+        
+sklearn.svm.SVC(C=1.0, kernel='rbf', degree=3, gamma='auto', coef0=0.0, shrinking=True, probability=False,tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=-1, decision_function_shape=None,random_state=None)
+        parameters:
+            C：既边界硬度，如果果C很大，边界就很硬，数据点不能再边界内生存，如果C小，边界线较软，有一些数据点可以穿越边界线。
+            kernel ：核函数，默认是rbf，可以是‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ 
+                线性：u'v
+                多项式：(gamma*u'*v + coef0)^degree
+                RBF函数：exp(-gamma|u-v|^2)
+                sigmoid：tanh(gamma*u'*v + coef0)
+            degree ：多项式poly函数的维度，默认是3，选择其他核函数时会被忽略。
+            gamma ： ‘rbf’,‘poly’ 和‘sigmoid’的核函数参数。默认是’auto’，则会选择1/n_features
+            coef0 ：核函数的常数项。对于‘poly’和 ‘sigmoid’有用。
+            class_weight ：类别的权重，字典形式传递。设置第几类的参数C为weight*C(C-SVC中的C)。
+        属性：
+            model.decision_function([a,b])：计算某个点到决策平面的函数距离。
+
+        attributes:
+            support_:array-like, shape = [n_SV],  Indices of support vectors.
+            support_vectors_ : array-like, shape = [n_SV, n_features],  Support vectors.
+            n_support_ : array-like, dtype=int32, shape = [n_class],Number of support vectors for each class.
+            dual_coef_ （双重斜率）: array, shape = [n_class-1, n_SV],Coefficients(系数） of the support vector in the decision function. For multiclass, coefficient for all 1-vs-1 classifiers. The layout of the coefficients in the multiclass case is somewhat non-trivial（非凡）. See the section about multi-class classification in the SVM section of the User Guide for details.
+            coef_ : array, shape = [n_class-1, n_features]，Weights assigned to the features (coefficients in the primal problem). This is only available in the case of a linear kernel.coef_ is a readonly property derived（衍生） from dual_coef_ and support_vectors_.
+            
+
+class sklearn.tree.DecisionTreeClassifier(criterion=’gini’, splitter=’best’, max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features=None, random_state=None, max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, class_weight=None, presort=False)
+                parameters:
+                    criterion：(评判准则)，default=”gini”，gini表示gini不纯度，entropy表示信息增益
+                    splitter : default=”best”，best：best split，random：best random split
+                    max_depth : int or None, (default=None)，The maximum depth of the tree. If None, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples.
+                    min_samples_split : int, float（percentages）, optional (default=2)，The minimum number of samples required to split an internal node:If int, then consider min_samples_split as the minimum number.If float, then min_samples_split is a percentage and ceil(min_samples_split * n_samples) are the minimum number of samples for each split. 节点最小样本数。
+                    min_samples_leaf : int, float, optional (default=1)The minimum number of samples required to be at a leaf node:If int, then consider min_samples_leaf as the minimum number.If float, then min_samples_leaf is a percentage and ceil(min_samples_leaf * n_samples) are the minimum number of samples for each node.叶子节点最小样本数。
+                    min_weight_fraction_leaf : float, optional (default=0.)The minimum weighted fraction of the sum total of weights (of all the input samples) required to be at a leaf node. Samples have equal weight when sample_weight is not provided.输入样本的权重，为0表示所有样本等权重。
+                    max_features : int, float, string or None, optional (default=None)，The number of features to consider when looking for the best split
+                    random_state : int, RandomState instance or None, optional (default=None)
+                    max_leaf_nodes : int or None, optional (default=None)，Grow a tree with max_leaf_nodes in best-first fashion. Best nodes are defined as relative reduction in impurity. If None then unlimited number of leaf nodes.
+                    min_impurity_decrease : float, optional (default=0.)
+                    min_impurity_split : float,
+                    class_weight : dict, list of dicts, “balanced” or None, default=None
+                    presort : bool, optional (default=False)
+                attributes:
+                    classes_ : array of shape = [n_classes] or a list of such arrays. The classes labels (single output problem), or a list of arrays of class labels (multi-output problem).
+                    feature_importances_ : array of shape = [n_features].The feature importances. The higher, the more important the feature. The importance of a feature is computed as the (normalized) total reduction of the criterion brought by that feature. It is also known as the Gini importance [R251].
+                    max_features_ : int,The inferred value of max_features.
+                    n_classes_ : int or list.The number of classes (for single output problems), or a list containing the number of classes for each output (for multi-output problems).
+                    n_features_ : int The number of features when fit is performed.
+                    n_outputs_ : int The number of outputs when fit is performed.
+                    tree_ : Tree object The underlying(潜在) Tree object.
+
+
+sklearn.ensemble.BaggingClassifier(base_estimator=None, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=None, random_state=None, verbose=0)
+                 parameters:
+                    base_estimator : object or None, optional (default=None)，The base estimator to fit on random subsets of the dataset. If None, then the base estimator is a decision tree.
+                    n_estimators : int, optional (default=10)，The number of base estimators in the ensemble.
+                    max_samples : int or float, optional (default=1.0)，The number of samples to draw from X to train each base estimator.If int, then draw max_samples samples.If float, then draw max_samples * X.shape[0] samples.
+                    max_features : int or float, optional (default=1.0)，The number of features to draw from X to train each base estimator.If int, then draw max_features features.If float, then draw max_features * X.shape[1] features.
+                    bootstrap : boolean, optional (default=True)，Whether samples are drawn with replacement.
+                    bootstrap_features : boolean, optional (default=False)，Whether features are drawn with replacement.
+                    oob_score : bool, optional (default=False)，Whether to use out-of-bag samples to estimate the generalization error.
+                    warm_start : bool, optional (default=False)，When set to True, reuse the solution of the previous call to fit and add more estimators to the ensemble, otherwise, just fit a whole new ensemble. See the Glossary.
+                    n_jobs : int or None, optional (default=None)，多进程并发执行各个树的计算。
+                    verbose : int, optional (default=0)，Controls the verbosity when fitting and predicting.
+                    
+                    
+RandomForestClassifier(n_estimators=10, criterion=’gini’, max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features=’auto’, max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, bootstrap=True, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False, class_weight=None)
+                parameters:
+                    n_estimators : integer, optional (default=10)，The number of trees in the forest.
+                    others same as DecisionTreeClassifier
+                    
+                    
