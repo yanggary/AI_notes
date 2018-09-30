@@ -43,4 +43,22 @@ ax.contourf(X,Y,P,colors='k',levels=[-1,0,1],alpha=0.5,linestyles=['--','-','--'
 
 from mpl_toolkits.mplot3d import axes3d可以闯将3D坐标
 
-axes是创建坐标轴，axis是设定其范围  
+axes是创建坐标轴，axis是设定属性(equal改变坐标轴范围来让圆更圆，scaled改变刻让圆更圆)。  
+
+ax.annotate('local max', xy=(3, 1),  xycoords='data',
+            xytext=(0.8, 0.95), textcoords='axes fraction',
+            arrowprops=dict(facecolor='black', shrink=0.05),
+            horizontalalignment='right', verticalalignment='top',fontsize=1
+
+    xy=(横坐标，纵坐标)  箭头尖端
+    xytext=(横坐标，纵坐标) 文字的坐标，指的是最左边的坐标
+    arrowprops= {
+        facecolor= '颜色',
+        shrink = '数字' <1  收缩箭头
+    }
+    
+画正方形rect = plt.Rectangle((0.2,0.75), 0.4, 0.15, color = ‘r’, alpha = 0.3)#左下起点，长，宽，颜色，α
+
+画圆circ = plt.Circle((0.7,0.2), 0.15, color = ‘b’, alpha = 0.5)#圆心，半径，颜色，α
+
+画三角形pgon = plt.Polygon([[0.15, 0.15], [0.35, 0.4], [0.2, 0.6]], color = ‘g’, alpha = 0.5 )#顶点坐标颜色α

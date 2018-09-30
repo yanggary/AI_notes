@@ -240,14 +240,126 @@
             2.多棵树可以进行概率分类，多个评估器之间的多数投票可以给出概率的估计值（使用sklearn的predict_proba()方法）。
             3.无参数模型很灵活
             
-
+            
 九、主成分分析
     主成分分析（principal component analysis, PCA）:是一种基础降维算法，尤其适用于可视化、噪音过滤、特征抽取、和特征工程等领域。
+    回归分析中我们希望根据x预测y,而无监督学习我们希望探索x和y之间的相关性。
+    pca.components_:成分
+    pca.explained_variance_：可解释差异
+    每个数据点在主轴上的投影就是数据的主成分。
+    仿射变换：从数据的坐标轴变换到主轴的变换，包含平移（translation）、旋转（rotation）和均匀缩放（uniform scaling）三个步骤。
+    PCA降维：pca.transform(X),降维后虽然50%的数据维度被缩减，但是数据的总体关系仍然被大致保留下来。
+    pca.explained_variance_ratio_：累计方差贡献率
+    特征数与累计方差贡献率曲线可以用来确定选择的PCA模型的特征数。
+    PCA噪声过滤：任何成分的方差都远大于噪音的方差，故而如果使用主成分的最大子集重构数据，就可以实现选择性保留信号并且丢弃噪音。
+    总结：
+        本节主要讨论用主成分分析进行，降维、高维数据可视化、噪音过滤、和高维数据特征选择。
+        弱点：经常受到数据集异常点的影响，RandomizedPCA和SparsePCA这两个算法丢弃了原始成分很糟糕的点。RandomizedPCA快速地近似计算出一个维度非常高的数据的前几个主成分，二SparsePCA引入了一个正则项来保证成分的稀疏性。
+        对非线性关系的数据集的处理效果并不好。
+
+
+十、流形学习（manifold learning）
+    可以弥补PCA对非线性数据处理效果不好的缺陷，是一种无监督评估器，它将一个低维度流形嵌入到一个高维度空间来描述数据集。
+    流形学习可以理解为把嵌入三维空间中的二维流形（三维空间一个剖面）
+    几种流形方法技巧：多维标度法（multidimensional scaling, MDS）,局部嵌入法（locally linear embedding, LLE）,保距映射法（isometric mapping, Isomap）
+    from sklearn.metrics import pairwise_distances可以计算原始数据的关系矩阵。
+    多维标度法（multidimensional scaling, MDS）：依靠数据点间关系矩阵，就可以还原出一种可行的二维坐标。
+        sklearn.manifold.MDS可以还原距离矩阵。dissimilarity=precomputed
+        流形学习评估器希望达成目标：给定一个高位嵌入数据，寻找数据的一个低维表示，并保留数据间的特定关系。
+        MDS是线性嵌入模型，它包括将数据旋转、平移和缩放到一个高维度空间的操作。
+    但是当嵌入为非线性时，既超越简单的操作集合时，MDS算法会失败，因为使用简单的MDS算法来处理这个数据，就无法展示数据非线性嵌入的特征，从而导致我们丢失了这个嵌入式流形的内部基本关系特征。
+    非线性流形：局部线性嵌入（locally linear embedding, LLE）
+        局部线性嵌入可以从非线性嵌入数据中恢复潜在数据特征
+        该方法不保留所有数据点之间的距离，只保留临近点之间的距离。
+        它通过对成本函数的全局优化来反映这个逻辑。
+        from sklearn.manifold import LocallyLinearEmbedding
+        n_neighbors=100表示取得临近点个数。
+    流形学习在实际应用中的要求非常严格，因此除了对高维度数据进行简单的定性可视化之外，流形学习很少被正式使用。
+    缺点：
+        1.流形学习中没有好的框架处理缺失值，相比之下PCA中有一个用于处理缺失值的迭代方法。
+        2.在流形学习中，数据噪音的出现将造成流形短路，并严重影响嵌入结果，相比下PCA可以自然地从最重要的成分中滤除噪音。
+        3.流形嵌入的结果通常高度依赖所选取的邻节点个数，并且通常没有确定的定量方式来选择最优邻节点数。相比下PCA并无此问题。
+        4.流形学习中全局最优的诶输出维度数很难确定，相比下PCA可以基于解释方差来确定输出的维度数。
+        5.流形学习中嵌入维度的含义并不总是很清楚，而在PCA算法中，主成分有明确含义。
+        6.流形学习中，流形算法复杂度为O[N**2]或O[N**3]，而PCA可以选择随机方法，通常速度更快。
+    虽然流形算法有缺点，但其有一明显优点（保留数据非线性关系的能力），所以通常做法是：先用PCA探索数据的线性特征，再用流形方法探索非线性特征。
+    其他几种流形算法：
+        1.LLE在sklearn.manifold.LocallyLinearEmbedding中实现。它对于简单问题，它对于S曲线，局部线性嵌入（LLE）及其变体（特别是modified LLE）的学习效果很好。
+        2.Isomap在sklearn.manifold.Isomap中实现，虽然LLE通常对现实世界的高位数据源的学习效果差，但是Isomap算法往往会获得较好的嵌入效果。
+        3.t-分布邻域嵌入法（t-distributed stochastic neighbor embedding, t-SNE）,在sklearn.manifold.TSNE中实现，将他用于高度聚类的数据效果比较好，但是该方法比其他方法学习速度慢。
+
+
+十一：k-means聚类
+    聚类算法：直接从数据的内在性质总学习最优的划分结果或者确定离散标签类型。
+    k-means算法在不带标签的多维数据集中寻找确定数量的簇。最优聚类结果要符合以下假设：
+        1.簇中心点（cluster center）是属于该簇的所有数据点坐标的算术平均值。
+        2.一个簇的每个点到簇中心点的距离比到其他簇中心点的的距离短。
+    k-means采用期望最大化算法取代穷举搜索。
+        穷举法：穷举法的基本思想是根据题目的部分条件确定答案的大致范围，并在此范围内对所有可能的情况逐一验证，直到全部情况验证完毕。若某个情况验证符合题目的全部条件，则为本问题的一个解；若全部情况验证后都不符合题目的全部条件，则本题无解。穷举法也称为枚举法。
+        最大期望法（expectation-maximization，E-M）：
+            1.猜测一些簇中心点。
+            2.重复直至收敛。
+                a.期望步骤（E-step）：将点分配至离其最近的簇中心点。
+                b.最大化步骤（M-step）：将簇中心点设置为所有点坐标的平均值。
+                E-step不断更新每个点是属于哪一个簇的期望值，M-step计算关于簇中心点的拟合函数值最大化对应坐标（argmax函数）——k-means中，通过简单求每个簇中所有数据点坐标的平均值得到了簇中心坐标。在典型环境下，每次重复E-step和M-step都会的到更好的聚类效果。
+            使用最大期望法可能不会达到全局最优结果，首先虽然E-M算法可以在每一步中改进结果，但是它并不保证可以获得全局最优解决方案。k-means还有一个显著问题：你必须告诉该算法数量，因为它无法从数据中自动学习到簇的数量。
+            轮廓分析法可以直观反映簇数量的取值是否合适。
+            Gaussian mixture models可以很好的对每个簇的聚类效果进行度量。
+            DBSCAN、均值漂移、临近传播等方法也可以用来选择簇数量
+    最邻近图（the graph of the nearest neighbors）：
+    k-means聚类的边界总是线性的，这就意味着当边界很复杂时，算法会失效，这时则可以通过核变换将数据投影到更高维的空间，投影后的数据使线性分离称为可能，这种算法在sklearn.SpectralClustering中实现，它使用最邻近图（the graph of the nearest neighbors）来计算数据的高维表示，然后用k-means算法分配标签。
+    批处理batch-based）k-means：
+    当数据量较大时k-means会很慢，由于k-means的每次迭代都必须获取数据集中所有点，因此随着数据量增加，算法会变得很慢。因此可以每一步使用数据集的一个子集来更新簇中心点。这就是批处理（batch-based）k-means算法的核心思想。sklearn.cluster.MiniBatchKMeans。
+    t-分布邻域嵌入算法：sklearn.manifold.TSNE，是一种非线性嵌入算法，擅长保留簇中的数据点。
+
+十二、高斯混合模型（Gaussian mixture model,GMM）
+    from sklearn.mixture import GMM
+    k-mean的非概率性，和它根据到簇中心点的距离来指派簇的特点将导致性能地下。本节介绍混合模型该模型是k-means思想的一个扩展。
+    k-means要求这些簇的模型必须是圆形：其内置的方法来实现椭圆形的簇。因此如果对同样的数据进行一些转换（数据的簇不是圆形），簇的分配就会变得混乱。
+    k-means两个缺点：
+        1.类形状缺少灵活性、2.缺少簇分配的概率，这两个缺点使得它对许多数据集（特别是低维数据集）的拟合效果不尽如人意。
+    GMM有一个隐含的概率模型，它可以找到簇分配的概率结果--predict_proba,结果为任意点属于某个簇的概率。这个算法有时并不是全局最优解，因此在实际使用中需使用多个随机初始解。
+    GMM 中covariance_type选项的设置是不同的，这个超参控制了每个簇的形状自由度，默认值是‘diag’意思是簇在每个维度的尺寸都可以单独设置，椭圆边界的主轴与坐标轴平行。
+    covariance_type=‘spherical’表示该模型通过约束簇的形状让所有维度相等。
+    covariance_type='full'表示该模型允许每个簇在任意方向上用椭圆建模。
+    GMM通常被归类为聚类算法，但它本质上是一个密度估计算法，既GMM拟合的结果并不是一个聚类模型，而是描述数据分布的生成概率模型。
+    赤池信息量准则（Akaike information criterion, AIC）、贝叶斯信息准则（Bayesian information criterion, BIC）可以用来调整模型的似然估计来纠正过拟合。
+    成分数量的选择度量是GMM作为一个密度评估器的性能，而不是作为一个聚类算法的性能。建议你还是把GMM当成一个密度评估器，仅在简单数据集中才将它作为聚类算法使用。
+
+
+十三、核密度估计
+    密度估计是一种通过D维数据集生成D维概率分布估计的算法。GMM算法用不同高斯分布的甲醛汇总来表示概率分布估计，核密度估计（kernel density estimation, KDE）算法将高斯混合理念扩展到了逻辑极限（logical extreme）。它通过对每个点生成高斯分布的混合成分，获得本质上无参数的密度评估器。
+    核密度估计的自由参数是核类型（kernel）参数，它可以指定每个点核密度分布的形状。而核带宽（kernel bandwidth）参数控制每个点的核的大小。在实际应用中，有很多核可用于核密度估计。KDE（kernel density estimation）支持六核。
+    sklearn.neighbors.KernelDensity,atol(绝对容错），rtol(相对容错)参数来平衡计算时间与准确性，可以用交叉验证工具来确定自有参数核带宽（kernel bandwidth）。
+    核带宽不仅对找到了合适的密度估计非常重要，也是在密度估计中控制偏差-方差平衡的关键：带宽过窄将导致估计呈现高方差（既过拟合），而且每个点的出现或缺失都会引起很大的不同，带宽过宽将导致估计呈现高偏差（欠拟合），而且带宽较大还会破坏数据结构。
+    用KDE生成非猎奇算法：
+        1.通过标签分割训练数据
+        2.为每个集合拟合一个KDE来获得数据的生成模型，这样就可以用任意x观察值和y标签计算出似然估计值P（x|y）。
+        3.根据训练集中每一类的样本数量，计算每一类的先验概率P（y）。
+        4.对于一个未知点x,每一类的后延概率P（x|y）P（y）,而后验概率最大的类就是分配给该点的标签。
+    在sklearn中每个评估器都是一个类，这个类可以很方便的集成字BaseEstimator(其中包含各种标准功能)，也支持试单搞得混合类（mixin, 多重集成方法）。所有拟合结果都存储在带后下划线的变量中如：self.logpriors_。
+    方向梯度直方图（Histogram of Oriented Gradients, HOG）可以将图像像素转换成向量形式，与图像具体内容有关，与图像合成因素无关。
+    HOG方法包含以下步骤。
+        1.图像标准化，消除照度对图像的影响。
+        2.用与水平和垂直方向的亮度梯度相关的两个过滤器处理图像，捕捉图像的变，角和纹理信息。
+        3.将图像切割成预定义大小的图块，然后计算每个图块内荼毒方向频次直方图。
+        4.对比每个图块与相邻图块的频次直方图，并做标准化处理，进一步消除照度对图像的影响。
+        5.获得描述每个图块信息的一维特征向量。
+        sklearn.Image内置了快速HOG提取器。
+    难负样本挖掘（hard negative mining）：给分类器看一些没见过的新图像，找出所有分类器识别错误的假正图像，然后将这些图像增加到训练集中，再中心训练分类器。
     
-        
-
-
-
-            
+    
+十五、机器学习参考资料
+    1.sklearn 官网http://scikit-learn.org
+    2.Scipy、PyCon和PyData教程
+    3.《机器学习入门》Andreas C. Mueller 和 Sarah Guido
+    4.《Python 机器学习》Sebastian Raschka
+    5.通用机器学习资源
+        Machine Learning（https://www.coursera.org/learn/machine-learning）
+　　
+        Pattern Recognition and Machine Learning（http://www.springer.com/us/book/9780387310732）
+　　
+        Machine Learning: A Probabilistic Perspective（https://mitpress.mit.edu/books/machine-learning-0）
+    
     
     

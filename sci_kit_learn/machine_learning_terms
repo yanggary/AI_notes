@@ -1,3 +1,5 @@
+标量：scalar
+向量:vector
 方差：varience
 标准差:standard deviation
 降维：dimensionality reduction
@@ -5,3 +7,27 @@
 因子分析：factor analysis
 隐变量：latent variable
 独立成分分析：independent component analysis ICA
+正交：orthogonal
+协方差：convarience
+特征值：eigenvalue
+特征向量：eigenvector
+流形学习:manifold learning
+多维标度法:multidimensional scaling, MDS
+局部嵌入法:locally linear embedding, LLE
+保距映射法:isometric mapping, Isomap
+聚类：clustering
+期望最大化：expectation-maximization，E-M
+批处理（batch-based）k-means
+最邻近图：the graph of the nearest neighbors
+均值漂移：MeanShift
+近邻传播：Affinity Propagation
+混淆矩阵：confusion matrix
+核密度估计:kernel density estimation, KDE
+直方图：histogram
+方向梯度直方图:Histogram of Oriented Gradients, HOG
+困难负样本挖掘：hard negative mining
+非极大值抑制：nonmaximum suppression
+深度神经网络：deep neural network
+监督学习（supervised learning）
+无监督学习(unsupervised learning)
+半监督学习(semi-supervised learning)

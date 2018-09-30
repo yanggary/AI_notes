@@ -1,0 +1,1 @@
+imread('fileName'):读取文件名矩阵。

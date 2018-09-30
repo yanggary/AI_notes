@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)https://www.cnblogs.com/zhoug2020/p/7842808.html -->
+<html lang="zh-cn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="origin">
+<title>旋转变换（一）旋转矩阵 - 莫水千流 - 博客园</title>
+<meta property="og:description" content="1. 简介 计算机图形学中的应用非常广泛的变换是一种称为仿射变换的特殊变换，在仿射变换中的基本变换包括平移、旋转、缩放、剪切这几种。本文以及接下来的几篇文章重点介绍一下关于旋转的变换，包括二维旋转变换">
+<link type="text/css" rel="stylesheet" href="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/blog-common.css">
+<link id="MainCss" type="text/css" rel="stylesheet" href="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/bundle-sea.css">
+<link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/bundle-sea-mobile.css">
+<link title="RSS" type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/zhoug2020/rss">
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/zhoug2020/rsd.xml">
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/zhoug2020/wlwmanifest.xml">
+<script async="" src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/analytics.js.下载"></script><script src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/jquery-2.2.0.min.js.下载"></script>
+<script type="text/javascript">var currentBlogApp = 'zhoug2020', cb_enable_mathjax=false;var isLogined=false;</script>
+<script src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/blog-common.js.下载" type="text/javascript"></script>
+</head>
+<body>
+<a name="top"></a>
+
+<!--done-->
+<div id="header">
+	
+<!--done-->
+<div class="header">
+	<div class="headerText">
+		<a id="Header1_HeaderTitle" class="headermaintitle" href="https://www.cnblogs.com/zhoug2020/">莫水千流</a><br>
+		
+	</div>
+</div>
+
+</div>
+
+<div id="mytopmenu">
+	
+		<div id="mylinks"><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">博客园</a> &nbsp;
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/zhoug2020/">首页</a> &nbsp;
+<a id="blog_nav_newpost" class="menu" rel="nofollow" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a> &nbsp;
+<a id="blog_nav_contact" class="menu" rel="nofollow" href="https://msg.cnblogs.com/send/%E8%8E%AB%E6%B0%B4%E5%8D%83%E6%B5%81">联系</a> &nbsp;
+<a id="blog_nav_rss" class="menu" href="https://www.cnblogs.com/zhoug2020/rss">订阅</a><a id="blog_nav_rss_image" href="https://www.cnblogs.com/zhoug2020/rss"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/xml.gif" alt="订阅"></a>&nbsp;
+<a id="blog_nav_admin" class="menu" rel="nofollow" href="https://i.cnblogs.com/">管理</a>
+</div>
+		<div id="mystats"><div id="blog_stats">
+随笔-596&nbsp;
+评论-184&nbsp;
+文章-0&nbsp;
+<!--trackbacks-0-->
+</div></div>
+	
+</div>
+<div id="centercontent">
+	
+<div id="post_detail">
+<div class="post">
+	<h1 class="postTitle"><a id="cb_post_title_url" class="postTitle2" href="https://www.cnblogs.com/zhoug2020/p/7842808.html">旋转变换（一）旋转矩阵</a></h1>
+	<div id="cnblogs_post_body" class="blogpost-body"><p align="left"><strong>1. </strong><strong>简介</strong></p>
+<p align="left">计算机图形学中的应用非常广泛的变换是一种称为仿射变换的特殊变换，在仿射变换中的基本变换包括平移、旋转、缩放、剪切这几种。本文以及接下来的几篇文章重点介绍一下关于旋转的变换，包括二维旋转变换、三维旋转变换以及它的一些表达方式（旋转矩阵、四元数、欧拉角等）。</p>
+<p align="left"><strong>2. </strong><strong>绕原点二维旋转</strong></p>
+<p align="left">首先要明确旋转在二维中是绕着某一个点进行旋转，三维中是绕着某一个轴进行旋转。二维旋转中最简单的场景是绕着坐标原点进行的旋转，如下图所示：</p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101008734-1171446672.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left">如图所示点v 绕 原点旋转<em>θ</em> 角，得到点v’，假设 v点的坐标是(x, y) ，那么可以推导得到 v’点的坐标（x’, y’)(设原点到v的距离是r，原点到v点的向量与x轴的夹角是<em>ϕ</em> ) <br>
+<em>x</em>=<em>rcosϕy</em>=<em>rsinϕ</em> <br>
+<em>x</em>′=<em>rcos</em>(<em>θ</em>+<em>ϕ</em>)<em>y</em>′=<em>rsin</em>(<em>θ</em>+<em>ϕ</em>) <br>
+通过三角函数展开得到 <br>
+<em>x</em>′=<em>rcosθcosϕ</em>−<em>rsinθsinϕ</em> <br>
+<em>y</em>′=<em>rsinθcosϕ</em>+<em>rcosθsinϕ</em> <br>
+带入x和y表达式得到 <br>
+<em>x</em>′=<em>xcosθ</em>−<em>ysinθ</em> <br>
+<em>y</em>′=<em>xsinθ</em>+<em>ycosθ</em> <br>
+写成矩阵的形式是： </p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101019015-876159441.png" alt=""></p>
+<p align="left">尽管图示中仅仅表示的是旋转一个锐角<em>θ</em>的情形，但是我们推导中使用的是三角函数的基本定义来计算坐标的，因此当旋转的角度是任意角度（例如大于180度，导致v’点进入到第四象限）结论仍然是成立的。</p>
+<p align="left"><strong>3. </strong><strong>绕任意点的二维旋转</strong></p>
+<p align="left">绕原点的旋转是二维旋转最基本的情况，当我们需要进行绕任意点旋转时，我们可以把这种情况转换到绕原点的旋转，思路如下： <br>
+1. 首先将旋转点移动到原点处 <br>
+2. 执行如2所描述的绕原点的旋转 <br>
+3. 再将旋转点移回到原来的位置</p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101032718-1931172402.png" alt=""></p>
+<p align="left">也就是说在处理绕任意点旋转的情况下需要执行两次平移的操作。假设平移的矩阵是T(x,y)，也就是说我们需要得到的坐标 v’=T(x,y)*R*T(-x,-y)（我们使用的是列坐标描述点的坐标，因此是左乘，首先执行T(-x,-y)）</p>
+<p align="left">在计算机图形学中，为了统一将平移、旋转、缩放等用矩阵表示，需要引入齐次坐标。（假设使用2x2的矩阵，是没有办法描述平移操作的，只有引入3x3矩阵形式，才能统一描述二维中的平移、旋转、缩放操作。同理必须使用4x4的矩阵才能统一描述三维的变换）。</p>
+<p align="left">对于二维平移，如下图所示，P点经过x和y方向的平移到P’点，可以得到：</p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101049359-1403552000.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left"><em>x</em>′=<em>x</em>+<em>tx</em></p>
+<p align="left"><em>y</em>′=<em>y</em>+<em>ty</em> <br>
+由于引入了齐次坐标，在描述二维坐标的时候，使用（x，y，w）的方式（一般w=1），于是可以写成下面矩阵的形式</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101059187-1388965856.png" alt="" width="370" height="87"></p>
+<p align="left"><br>
+按矩阵乘法展开，正好得到上面的表达式。也就是说平移矩阵是 </p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101134921-800160107.png" alt="" width="171" height="137"></p>
+<p align="left">如果平移值是（-tx，-ty）那么很明显平移矩阵式 </p>
+<p>&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101153577-270820324.png" alt="" width="183" height="126"></p>
+<p>&nbsp;</p>
+<p>我们可以把2中描述的旋转矩阵也扩展到3x3的方式，变为： </p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101213374-472387734.png" alt="" width="325" height="91"></p>
+<p align="left"><br>
+从平移和旋转的矩阵可以看出，3x3矩阵的前2x2部分是和旋转相关的，第三列与平移相关。有了上面的基础之后，我们很容易得出二维中绕任意点旋转的旋转矩阵了，只需要把三个矩阵乘起来即可：<br><br></p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101236827-444832333.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left"><strong>4. </strong><strong>三维基本旋转</strong></p>
+<p align="left">我们可以把一个旋转转换为绕基本坐标轴的旋转，因此有必要讨论一下绕三个坐标值x、y、z的旋转。 <br>
+本文在讨论过程中使用的是类似于OpenGL中定义的<strong>右手坐标系</strong>，同时旋转角度的正负也遵循右手坐标系的约定。如下图所示</p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101249890-1052862423.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left"><strong>4.1 </strong><strong>绕X轴的旋转</strong></p>
+<p align="left">在三维场景中，当一个点P(x,y,z)绕x轴旋转<em>θ</em>角得到点P’(x’,y’,z’)。由于是绕x轴进行的旋转，因此x坐标保持不变，y和z组成的yoz（o是坐标原点）平面上进行的是一个二维的旋转，可以参考上图（y轴类似于二维旋转中的x轴，z轴类似于二维旋转中的y轴），于是有： <br>
+<em>x</em>′=<em>x</em> <br>
+<em>y</em>′=<em>ycosθ</em>−<em>zsinθ</em> <br>
+<em>z</em>′=<em>ysinθ</em>+<em>zcosθ</em> <br>
+写成（4x4）矩阵的形式 </p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101300406-107284024.png" alt=""></p>
+<p align="left"><strong>4.2 </strong><strong>绕Y轴旋转</strong></p>
+<p align="left">绕Y轴的旋转和绕X轴的旋转类似，Y坐标保持不变，除Y轴之外，ZOX组成的平面进行一次二维的旋转（Z轴类似于二维旋转的X轴，X轴类似于二维旋转中的Y轴，<strong>注意这里是ZOX，而不是XOZ</strong>，观察上图中右手系的图片可以很容易了解到这一点），同样有： <br>
+<em>x</em>′=<em>zsinθ</em>+<em>xcosθ</em> <br>
+<em>y</em>′=<em>y</em> <br>
+<em>z</em>′=<em>zcosθ</em>−<em>xsinθ</em> <br>
+写成（4x4）矩阵的形式 </p>
+<p align="left">&nbsp;</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101408812-1342345363.png" alt="" width="351" height="124"></p>
+<p align="center">&nbsp;</p>
+<p align="left"><strong>4.3 </strong><strong>绕Z轴旋转</strong></p>
+<p align="left">与上面类似，绕Z轴旋转，Z坐标保持不变，xoy组成的平面内正好进行一次二维旋转（和上面讨论二维旋转的情况完全一样）
+</p>
+<p align="left">&nbsp;</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101436015-326918856.png" alt=""></p>
+<p align="center">&nbsp; </p>
+<p align="left"><strong>4.4 </strong><strong>小结</strong></p>
+<p align="left">上面描述了三维变换中绕单一轴旋转的矩阵表达形式，绕三个轴旋转的矩阵很类似，其中绕y轴旋转的矩阵与绕x和z轴旋转的矩阵略有点不同（主要是三个轴向顺序和书写矩阵的方式不一致导致的，绕三个不同坐标旋转轴以及其他二个坐标轴组成平面的顺序是： XYZ(绕x轴） YZX（绕y轴） ZXY（绕z轴），其中绕y轴旋转，其他两个轴是ZX，这和我们书写矩阵按 </p>
+<p align="center">&nbsp;</p>
+<p align="center"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101458515-557883595.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="left"><br>
+的方式不一致，而导致看起来绕Y轴旋转的矩阵似乎是和其他两个矩阵不一致。如果我们颠倒写法，将公式写成
+</p>
+<p align="center">&nbsp;</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101505359-486252386.png" alt=""></p>
+<p align="left"><br>
+的方式，那么这三个旋转矩阵看起来在形式上就统一了，都是 </p>
+<p align="center"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101515327-1021164959.png" alt="" width="319" height="129"></p>
+<p>&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="left"><br>
+这种表现形式了（左上角都是−<em>sinθ</em>）</p>
+<p align="left"><strong>5. </strong><strong>绕任意轴的三维旋转</strong></p>
+<p align="left">绕任意轴的三维旋转可以使用类似于绕任意点的二维旋转一样，将旋转分解为一些列基本的旋转。绕任意轴旋转如下图所示：</p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101536359-907895905.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left">P点绕向量u旋转<em>θ</em>角，得到点Q，已知P点的坐标和向量u，如何求Q点的坐标。 <br>
+我们可以把向量u进行一些旋转，让它与z轴重合，之后旋转P到Q就作了一次绕Z轴的三维基本旋转，之后我们再执行反向的旋转，将向量u变回到它原来的方向，也就是说需要进行的操作如下： <br>
+1. 将旋转轴u绕x轴旋转至xoz平面 <br>
+2. 将旋转轴u绕y轴旋转至于z轴重合 <br>
+3. 绕z轴旋转<em>θ</em>角 <br>
+4. 执行步骤2的逆过程 <br>
+5. 执行步骤1的逆过程 <br>
+原始的旋转轴u如下图所示：</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101556437-1330020477.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left"><br>
+第1、2、3步骤如下图所示： <br>
+<br>
+<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101603546-498806724.png" alt=""></p>
+<p><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101617515-1366961689.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101624156-2041751447.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left"><br>
+</p>
+<p align="left">步骤1将向量u旋转至xoz平面的操作是一个绕x轴的旋转操作，步骤2将向量u旋转到与z轴重合，第1、2步骤的示意图如下：</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101645906-453639167.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left"><br>
+作点P在yoz平面的投影点q，q的坐标是（0, b, c)，原点o与q点的连线oq和z轴的夹角就是u绕x轴旋转的角度。通过这次旋转使得u向量旋转到xoz平面（图中的or向量）【步骤1】 <br>
+过r点作z轴的垂线，or与z轴的夹角为<em>β</em>, 这个角度就是绕Y轴旋转的角度，通过这次旋转使得u向量旋转到与z轴重合【步骤2】</p>
+<p align="left">步骤1中绕x轴旋转的是一次基本的绕x轴的三维旋转，按照之前的讨论，旋转矩阵是：
+</p>
+<p align="center">&nbsp;</p>
+<p align="center"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101658374-1380183391.png" alt="" width="284" height="163"></p>
+<p align="center">&nbsp;</p>
+<p align="left"><br>
+这里的<em>θ</em>就是图中所示的<em>α</em>角 （注意<em>α</em>角度是绕x旋转的正的角度） <br>
+从图中我们还可以得到： </p>
+<p align="center"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101724437-352100640.png" alt="" width="294" height="245"> </p>
+<p align="left"><br>
+于是旋转矩阵(记作 <em>R</em><em>x</em>(<em>α</em>))为： </p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101743702-299028999.png" alt="" width="355" height="203"></p>
+<p>&nbsp;</p>
+<p align="left"><br>
+在完成步骤1之后，向量u被变换到了r的位置，我们继续步骤2的操作，绕y轴旋转<strong>负的</strong><em>β</em>角（注意：这里的<em>β</em>是负的），经过这次变换之后向量u与z轴完全重合，由于这一步也是执行的一次绕Y轴的基本旋转，旋转矩阵（记作 <em>R</em><em>y</em>(−<em>β</em>))为： </p>
+<p align="center">&nbsp;</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101756327-790611908.png" alt="" width="257" height="137"></p>
+<p>&nbsp;</p>
+<p align="left"><br>
+使用−<em>β</em>替换表达式中的<em>θ</em>，此外根据图中描述，我们可以计算得到： </p>
+<p align="center">&nbsp;</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101814421-207959464.png" alt="" width="259" height="211"></p>
+<p>&nbsp;</p>
+<p align="left"><br>
+带入上面的表达式，于是旋转矩阵(记作 <em>R</em><em>y</em>(−<em>β</em>))为： </p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101829374-587310887.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left">在完成前面两个步骤之后，u方向和z轴完全重合，因此执行旋转<em>θ</em>角，执行的是一次绕z轴的基本三维旋转（记作 <em>R</em>(<em>θ</em>)，根据之前的讨论，我们可以得到： </p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101850999-1975633711.png" alt=""></p>
+<p align="left"><br>
+最后两步骤是前面1和2的逆操作，也就是绕Y轴旋转<em>β</em> 和绕X轴旋转−<em>α</em>，这两个矩阵分别记作 <em>R</em><em>y</em>(<em>β</em>) 和 <em>R</em><em>x</em>(−<em>α</em>)，得到它们的方式很简单，只需要将上面步骤1和步骤2中的角度修改成相反数即可，也就是：</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101927484-539721766.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="left">最终得到 绕任意轴u旋转的旋转矩阵是【因为使用的列向量，因此执行的是左乘（从右往左）】：</p>
+<p align="center"><em>M</em><em>R</em>=<em>R</em><em>x</em>(−<em>α</em>)<em>R</em><em>y</em>(<em>β</em>)<em>R</em><em>z</em>(<em>θ</em>)<em>R</em><em>y</em>(−<em>β</em>)<em>R</em><em>x</em>(<em>α</em>)=</p>
+<p align="left">&nbsp;</p>
+<p align="left"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101946077-335653049.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left"><br>
+<br>
+<em>(</em><em>注：式中的(u,v,w)对应上文中向量(a,b,c)，公式我自己笔算过，为了减少编辑公式的时间（使用LaTex编辑太繁琐，因此找了一张公式的图片贴在此处)</em></p>
+<p align="left">如果向量是经过单位化的（单位向量），那么有<em>a</em>2+<em>b</em>2+<em>c</em>2=1，可以简化上述的公式，得到：</p>
+<p align="left">&nbsp;<img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/71080-20171116101958218-735735549.png" alt=""></p>
+<p>&nbsp;</p>
+<p align="left">参考文献：</p>
+<ol>
+<li><a href="https://en.wikipedia.org/wiki/Rotation_%28mathematics%29" target="_blank">Wiki Rotation (mathematics)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Euler%27s_rotation_theorem" target="_blank">Euler’s rotation theorem</a></li>
+<li><a href="http://www.euclideanspace.com/maths/algebra/matrix/orthogonal/rotation/index.htm" target="_blank">Maths - Rotation Matrices</a></li>
+<li><a href="http://www.cnblogs.com/graphics/archive/2012/08/10/2627458.html" target="_blank">绕任意轴旋转</a></li>
+<li><a href="http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/" target="_blank">Rotation About an Arbitrary Axis in 3
+Dimensions</a></li>
+<li><a href="http://www.engr.uvic.ca/~mech410/lectures/4_2_RotateArbi.pdf" target="_blank">Rotation about an Arbitrary Axis
+(Line)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</ol>
+<p>&nbsp;</p></div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory">分类: <a href="https://www.cnblogs.com/zhoug2020/category/870802.html" target="_blank">[020] 数学</a></div>
+<div id="EntryTag"></div>
+<div id="blog_post_info"><div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(7842808,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+            <a id="green_channel_follow" onclick="follow(&#39;2dbbe17c-6556-de11-9510-001cf0cd104b&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/zhoug2020/" target="_blank"><img src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/u71080.jpg" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/zhoug2020/">莫水千流</a><br>
+            <a href="http://home.cnblogs.com/u/zhoug2020/followees">关注 - 38</a><br>
+            <a href="http://home.cnblogs.com/u/zhoug2020/followers">粉丝 - 113</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow(&#39;2dbbe17c-6556-de11-9510-001cf0cd104b&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(7842808,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">1</span>
+    </div>
+    <div class="buryit" onclick="votePost(7842808,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+<div class="clear"></div>
+<div id="post_next_prev"><a href="https://www.cnblogs.com/zhoug2020/p/7821125.html" class="p_n_p_prefix">« </a> 上一篇：<a href="https://www.cnblogs.com/zhoug2020/p/7821125.html" title="发布于2017-11-12 10:40">[转载]非常量引用的初始值必须为左值的问题</a><br><a href="https://www.cnblogs.com/zhoug2020/p/7859282.html" class="p_n_p_prefix">» </a> 下一篇：<a href="https://www.cnblogs.com/zhoug2020/p/7859282.html" title="发布于2017-11-19 11:00">矩阵中的旋转(Rotation)</a><br></div>
+</div>
+
+
+	<div class="postDesc">posted on <span id="post-date">2017-11-16 09:44</span> <a href="https://www.cnblogs.com/zhoug2020/">莫水千流</a> 阅读(<span id="post_view_count">3666</span>) 评论(<span id="post_comment_count">0</span>)  <a href="https://i.cnblogs.com/EditPosts.aspx?postid=7842808" rel="nofollow">编辑</a> <a href="https://www.cnblogs.com/zhoug2020/p/7842808.html#" onclick="AddToWz(7842808);return false;">收藏</a></div>
+</div>
+<script type="text/javascript">var allowComments=true,cb_blogId=106563,cb_entryId=7842808,cb_blogApp=currentBlogApp,cb_blogUserGuid='2dbbe17c-6556-de11-9510-001cf0cd104b',cb_entryCreatedDate='2017/11/16 9:44:00';loadViewCount(cb_entryId);var cb_postType=1;</script>
+
+</div><a name="!comments"></a><div id="blog-comments-placeholder"></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id="comment_form" class="commentform">
+<a name="commentform"></a>
+<div id="divCommentShow"></div>
+<div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="https://www.cnblogs.com/zhoug2020/p/7842808.html#" onclick="return RefreshPage();">刷新页面</a><a href="https://www.cnblogs.com/zhoug2020/p/7842808.html#top">返回顶部</a></div>
+<div id="comment_form_container"><div class="login_tips">注册用户登录后才能发表评论，请 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login(&#39;commentform&#39;);">登录</a> 或 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，<a href="http://www.cnblogs.com/">访问</a>网站首页。</div></div>
+<div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+<div id="ad_t2"><a href="http://www.ucancode.com/index.htm" target="_blank">【推荐】超50万VC++源码: 大型组态工控、电力仿真CAD与GIS源码库！</a><br><a href="https://www.linuxprobe.com/chapter-00.html" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-linuxprobe&#39;)">【免费】要想入门学习Linux系统技术，你应该先选择一本适合自己的书籍</a><br><a href="https://www.grapecity.com.cn/developer/spreadjs?utm_source=cnblogs&amp;utm_medium=blogpage&amp;utm_term=bottom&amp;utm_content=SpreadJS&amp;utm_campaign=community" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-SpreadJS&#39;)">【前端】SpreadJS表格控件，可嵌入应用开发的在线Excel</a><br><a href="https://cloud.tencent.com/developer/edu/major-100005?fromSource=gwzcw.1312543.1312543.1312543#course-1274" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-微信支付&#39;)">【直播】如何快速接入微信支付功能</a><br></div>
+<div id="opt_under_post"></div>
+<div id="cnblogs_c1" class="c_ad_block"><a href="https://cloud.tencent.com/act/special/rav?fromSource=gwzcw.1312547.1312547.1312547" target="_blank"><img width="300" height="250" src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/24442-20180914091419057-283402001.jpg" alt="腾讯云" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;C1&#39;);"></a></div>
+<div id="under_post_news"><div class="itnews c_ad_block"><b>最新IT新闻</b>:<br> ·  <a href="https://news.cnblogs.com/n/608146/" target="_blank">ofo北京总部否认裁员 保安称供应商催账频现曾报警</a><br> ·  <a href="https://news.cnblogs.com/n/608147/" target="_blank">德国西门子裁员2900人 将在未来两年进行</a><br> ·  <a href="https://news.cnblogs.com/n/608143/" target="_blank">谷歌高管向国会委员会承认：我们在隐私问题上犯过错</a><br> ·  <a href="https://news.cnblogs.com/n/608141/" target="_blank">海立股份大股东增持回应格力两度举牌 董明珠接盘海立行动受阻</a><br> ·  <a href="https://news.cnblogs.com/n/608139/" target="_blank">McAfee最新报告：2018Q2加密货币恶意软件数量环比增长86%</a><br>» <a href="http://news.cnblogs.com/" title="IT新闻" target="_blank">更多新闻...</a></div></div>
+<div id="cnblogs_c2" class="c_ad_block"><a href="http://clickc.admaster.com.cn/c/a113319,b2799157,c1705,i0,m101,8a1,8b3,h" target="_blank"><img width="468" height="60" src="./旋转变换（一）旋转矩阵 - 莫水千流 - 博客园_files/24442-20180916205959082-1265433055.jpg" alt="华为云HC0917" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;C2&#39;);"></a></div>
+<div id="under_post_kb"><div class="itnews c_ad_block" id="kb_block"><b>最新知识库文章</b>:<br><div id="kb_recent"> ·  <a href="https://kb.cnblogs.com/page/606682/" target="_blank">为什么说 Java 程序员必须掌握 Spring Boot ？</a><br> ·  <a href="https://kb.cnblogs.com/page/606645/" target="_blank">在学习中，有一个比掌握知识更重要的能力</a><br> ·  <a href="https://kb.cnblogs.com/page/603663/" target="_blank">如何招到一个靠谱的程序员</a><br> ·  <a href="https://kb.cnblogs.com/page/573614/" target="_blank">一个故事看懂“区块链”</a><br> ·  <a href="https://kb.cnblogs.com/page/603697/" target="_blank">被踢出去的用户</a><br></div>» <a href="https://kb.cnblogs.com/" target="_blank">更多知识库文章...</a></div></div>
+<div id="HistoryToday" class="c_ad_block"><b>历史上的今天:</b><br>2015-11-16 <a href="https://www.cnblogs.com/zhoug2020/p/4967979.html">百度云盘不能搜索别人的分享</a><br></div>
+<script type="text/javascript">
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+</div>
+<div id="leftcontent">
+	
+		<div id="leftcontentcontainer">
+			
+<!--done-->
+<div class="newsItem">
+	<div id="blog-news"><div id="profile_block">昵称：<a href="https://home.cnblogs.com/u/zhoug2020/">莫水千流</a><br>园龄：<a href="https://home.cnblogs.com/u/zhoug2020/" title="入园时间：2009-06-11">9年3个月</a><br>粉丝：<a href="https://home.cnblogs.com/u/zhoug2020/followers/">113</a><br>关注：<a href="https://home.cnblogs.com/u/zhoug2020/followees/">38</a><div id="p_b_follow"><a href="javascript:void(0);" onclick="follow(&#39;2dbbe17c-6556-de11-9510-001cf0cd104b&#39;)">+加关注</a></div><script>getFollowStatus('2dbbe17c-6556-de11-9510-001cf0cd104b')</script></div></div><script type="text/javascript">loadBlogNews();</script>
+</div>
+
+			<div id="blog-calendar" style=""><table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar">
+	<tbody><tr><td colspan="7"><table class="CalTitle" cellspacing="0">
+		<tbody><tr><td class="CalNextPrev"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2018/08/01&#39;);return false;">&lt;</a></td><td align="center">2018年9月</td><td class="CalNextPrev" align="right"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2018/10/01&#39;);return false;">&gt;</a></td></tr>
+	</tbody></table></td></tr><tr><th class="CalDayHeader" align="center" abbr="日" scope="col">日</th><th class="CalDayHeader" align="center" abbr="一" scope="col">一</th><th class="CalDayHeader" align="center" abbr="二" scope="col">二</th><th class="CalDayHeader" align="center" abbr="三" scope="col">三</th><th class="CalDayHeader" align="center" abbr="四" scope="col">四</th><th class="CalDayHeader" align="center" abbr="五" scope="col">五</th><th class="CalDayHeader" align="center" abbr="六" scope="col">六</th></tr><tr><td class="CalOtherMonthDay" align="center">26</td><td class="CalOtherMonthDay" align="center">27</td><td class="CalOtherMonthDay" align="center">28</td><td class="CalOtherMonthDay" align="center">29</td><td class="CalOtherMonthDay" align="center">30</td><td class="CalOtherMonthDay" align="center">31</td><td class="CalWeekendDay" align="center">1</td></tr><tr><td class="CalWeekendDay" align="center">2</td><td align="center">3</td><td align="center">4</td><td align="center">5</td><td align="center">6</td><td align="center">7</td><td class="CalWeekendDay" align="center">8</td></tr><tr><td class="CalWeekendDay" align="center">9</td><td align="center">10</td><td align="center">11</td><td align="center">12</td><td align="center">13</td><td align="center">14</td><td class="CalWeekendDay" align="center">15</td></tr><tr><td class="CalWeekendDay" align="center">16</td><td align="center">17</td><td align="center">18</td><td align="center">19</td><td align="center">20</td><td align="center">21</td><td class="CalWeekendDay" align="center">22</td></tr><tr><td class="CalWeekendDay" align="center">23</td><td align="center">24</td><td align="center">25</td><td class="CalTodayDay" align="center">26</td><td align="center">27</td><td align="center">28</td><td class="CalWeekendDay" align="center">29</td></tr><tr><td class="CalWeekendDay" align="center">30</td><td class="CalOtherMonthDay" align="center">1</td><td class="CalOtherMonthDay" align="center">2</td><td class="CalOtherMonthDay" align="center">3</td><td class="CalOtherMonthDay" align="center">4</td><td class="CalOtherMonthDay" align="center">5</td><td class="CalOtherMonthDay" align="center">6</td></tr>
+</tbody></table></div><script type="text/javascript">loadBlogDefaultCalendar();</script><br>
+			<div id="blog-sidecolumn"><div id="sidebar_search" class="sidebar-block">
+<div id="sidebar_search" class="mySearch">
+<h3 class="catListTitle">搜索</h3>
+<div id="sidebar_search_box">
+<div id="widget_my_zzk" class="div_my_zzk"><input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk"></div>
+<div id="widget_my_google" class="div_my_zzk"><input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event)" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk"></div>
+</div>
+</div>
+
+</div><div id="sidebar_shortcut" class="sidebar-block">
+<h3 class="catListTitle">常用链接</h3>
+<ul>
+<li><a href="https://www.cnblogs.com/zhoug2020/p/" title="我的博客的随笔列表">我的随笔</a></li><li><a href="https://www.cnblogs.com/zhoug2020/MyComments.html" title="我发表过的评论列表">我的评论</a></li><li><a href="https://www.cnblogs.com/zhoug2020/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li><li><a href="https://www.cnblogs.com/zhoug2020/RecentComments.html" title="我的博客的评论列表">最新评论</a></li><li><a href="https://www.cnblogs.com/zhoug2020/tag/" title="我的博客的标签列表">我的标签</a></li>
+</ul>
+<div id="itemListLin_con" style="display:none;">
+
+</div></div><div id="sidebar_toptags" class="sidebar-block"></div><div id="sidebar_categories">
+		<h3 class="catListTitle">随笔分类</h3>
+		
+				<ul class="catList">
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_0" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/349203.html">[001] VC(27)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_1" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/349204.html">[002] C/C++(136)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_2" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/665595.html">[0021] QT(19)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_3" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/714925.html">[0022]单体测试(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_4" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/767519.html">[0023]代码静态检查(3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_5" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/432378.html">[003] 数据结构(21)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_6" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/517210.html">[004] 数据库(28)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_7" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/368935.html">[005] Linux(61)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_8" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/389232.html">[006] 模式设计(15)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_9" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/510282.html">[007] 计算机管理(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_10" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/605391.html">[008] 导航(39)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_11" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/519184.html">[009] windows(16)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_12" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/520270.html">[010] 英语学习(14)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_13" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/524964.html">[011] 其他(40)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_14" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/706968.html">[012] 算法(18)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_15" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/766349.html">[013] 汇编(5)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_16" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/771557.html">[014]正则表达式(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_17" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/863799.html">[015] 版本控制(22)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_18" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/647245.html">[0151]smartgit(18)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_19" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/854277.html">[016]Android(14)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_20" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/856418.html">[017]音频，视频，图像(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_21" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/867924.html">[0171]OPEN GL(12)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_22" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/859927.html">[018]C#(21)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_23" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/870051.html">[019] HMI(22)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_24" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/870802.html">[020] 数学(16)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_25" class="listitem" href="https://www.cnblogs.com/zhoug2020/category/879409.html">[021] Python(15)</a></li>
+			
+				</ul>
+			
+	
+		<h3 class="catListTitle">随笔档案</h3>
+		
+				<ul class="catList">
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_0" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2018/08.html">2018年8月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_1" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2018/07.html">2018年7月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_2" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2018/06.html">2018年6月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_3" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2018/05.html">2018年5月 (9)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_4" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2018/04.html">2018年4月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_5" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2018/03.html">2018年3月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_6" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2018/02.html">2018年2月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_7" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2018/01.html">2018年1月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_8" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/12.html">2017年12月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_9" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/11.html">2017年11月 (14)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_10" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/10.html">2017年10月 (22)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_11" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/09.html">2017年9月 (11)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_12" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/08.html">2017年8月 (7)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_13" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/06.html">2017年6月 (7)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_14" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/05.html">2017年5月 (10)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_15" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/04.html">2017年4月 (17)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_16" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/03.html">2017年3月 (21)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_17" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/02.html">2017年2月 (17)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_18" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2017/01.html">2017年1月 (18)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_19" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/12.html">2016年12月 (15)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_20" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/11.html">2016年11月 (29)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_21" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/10.html">2016年10月 (11)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_22" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/09.html">2016年9月 (37)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_23" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/08.html">2016年8月 (42)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_24" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/07.html">2016年7月 (15)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_25" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/06.html">2016年6月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_26" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/05.html">2016年5月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_27" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/04.html">2016年4月 (9)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_28" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/03.html">2016年3月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_29" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/02.html">2016年2月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_30" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2016/01.html">2016年1月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_31" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/12.html">2015年12月 (26)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_32" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/11.html">2015年11月 (5)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_33" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/10.html">2015年10月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_34" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/09.html">2015年9月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_35" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/07.html">2015年7月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_36" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/06.html">2015年6月 (8)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_37" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/05.html">2015年5月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_38" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/04.html">2015年4月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_39" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/03.html">2015年3月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_40" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/02.html">2015年2月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_41" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2015/01.html">2015年1月 (7)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_42" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/12.html">2014年12月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_43" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/11.html">2014年11月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_44" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/10.html">2014年10月 (22)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_45" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/09.html">2014年9月 (8)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_46" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/08.html">2014年8月 (10)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_47" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/07.html">2014年7月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_48" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/06.html">2014年6月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_49" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/05.html">2014年5月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_50" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/04.html">2014年4月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_51" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2014/01.html">2014年1月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_52" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2013/12.html">2013年12月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_53" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2013/11.html">2013年11月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_54" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2013/10.html">2013年10月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_55" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2013/09.html">2013年9月 (28)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_56" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2013/08.html">2013年8月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_57" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2013/07.html">2013年7月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_58" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2013/06.html">2013年6月 (7)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_59" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2013/03.html">2013年3月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_60" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2013/01.html">2013年1月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_61" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2012/11.html">2012年11月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_62" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2012/10.html">2012年10月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_63" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2012/08.html">2012年8月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_64" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2012/07.html">2012年7月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_65" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2012/06.html">2012年6月 (18)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_66" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2012/05.html">2012年5月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_67" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2012/04.html">2012年4月 (27)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_68" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2012/02.html">2012年2月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_69" class="listitem" href="https://www.cnblogs.com/zhoug2020/archive/2012/01.html">2012年1月 (8)</a></li>
+			
+				</ul>
+			
+	
+</div><div id="sidebar_recentcomments" class="sidebar-block"><div id="recent_comments_wrap">
+<h3 class="catListTitle">最新评论</h3>
+<div class="RecentComment" id="RecentComments">
+	<div id="RecentCommentsBlock"><ul>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/zhoug2020/p/3468167.html#4064999">1. Re:A星寻路算法介绍</a></li>
+        <li class="recent_comment_body">请问为什么估价函数取得越小 需要搜索的状态就越多呢？我自己模拟了一个简单的图 发现估价函数取的大小并不影响搜索状态的多少啊？</li>
+        <li class="recent_comment_author">--Beethoven_ov</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/zhoug2020/p/3468167.html#4039376">2. Re:A星寻路算法介绍</a></li>
+        <li class="recent_comment_body">很清晰,膜拜膜拜</li>
+        <li class="recent_comment_author">--都斌大苏打</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/zhoug2020/p/3468167.html#4033680">3. Re:A星寻路算法介绍</a></li>
+        <li class="recent_comment_body">强！讲的太清晰了！</li>
+        <li class="recent_comment_author">--DukeLv</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/zhoug2020/p/5370535.html#4011815">4. Re:QT防止程序启动两次的方法</a></li>
+        <li class="recent_comment_body">多谢楼主分享</li>
+        <li class="recent_comment_author">--青儿哥哥</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/zhoug2020/p/5789041.html#3999578">5. Re:git 服务器搭建，在自己服务器上搭建私有仓库</a></li>
+        <li class="recent_comment_body">请问个问题，我已经向服务器push了代码，但是只能看到服务器上的 git log信息，但是具体的代码在那个文件下面呢。。。</li>
+        <li class="recent_comment_author">--Ajanuw</li>
+</ul>
+</div>
+</div>
+</div></div><div id="sidebar_topviewedposts" class="sidebar-block"><div id="topview_posts_wrap">
+<h3 class="catListTitle">阅读排行榜</h3>
+<div class="RecentComment" id="TopViewPosts"> 
+	<div id="TopViewPostsBlock"><ul><li><a href="https://www.cnblogs.com/zhoug2020/p/3468167.html">1. A星寻路算法介绍(61405)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/3950933.html">2. 根据两点经纬度计算距离(54202)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/3789076.html">3. QTableWidget详解（样式、右键菜单、表头塌陷、多选等）(47128)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/4913302.html">4. left join on 和where条件的放置(46209)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/5079407.html">5. python中的subprocess.Popen（）使用(43379)</a></li></ul></div>
+</div>
+</div></div><div id="sidebar_topcommentedposts" class="sidebar-block"><div id="topfeedback_posts_wrap">
+<h3 class="catListTitle">评论排行榜</h3>
+<div class="RecentComment" id="TopCommentsPosts">
+	<div id="TopFeedbackPostsBlock"><ul><li><a href="https://www.cnblogs.com/zhoug2020/archive/2013/03/22/2975924.html">1. 转码网址(25)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/3468167.html">2. A星寻路算法介绍(21)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/6419644.html">3. QT STUDY(9)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/6423488.html">4. qt study2(7)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/5064759.html">5. python git log(4)</a></li></ul></div>
+</div></div></div><div id="sidebar_topdiggedposts" class="sidebar-block"><div id="topdigg_posts_wrap">
+<h3 class="catListTitle">推荐排行榜</h3>
+<div class="RecentComment">
+	<div id="TopDiggPostsBlock"><ul><li><a href="https://www.cnblogs.com/zhoug2020/p/3468167.html">1. A星寻路算法介绍(11)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/3789076.html">2. QTableWidget详解（样式、右键菜单、表头塌陷、多选等）(8)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/3950933.html">3. 根据两点经纬度计算距离(5)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/archive/2012/08/31/2665451.html">4. C++ 类中特殊的成员变量（常变量、引用、静态）的初始化方法(4)</a></li><li><a href="https://www.cnblogs.com/zhoug2020/p/4913302.html">5. left join on 和where条件的放置(3)</a></li></ul></div>
+</div></div></div></div><script type="text/javascript">loadBlogSideColumn();</script></div>
+	
+</div>
+
+<!--done-->
+<div class="footer">
+	Powered by: <a href="http://www.cnblogs.com/">博客园</a>	模板提供：<a href="http://blog.hjenglish.com/">沪江博客</a>
+	Copyright ©2018 莫水千流
+</div>
+
+
+
+
+
+</body></html>

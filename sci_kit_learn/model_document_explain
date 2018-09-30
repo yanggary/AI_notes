@@ -216,3 +216,21 @@ RandomForestClassifier(n_estimators=10, criterion=’gini’, max_depth=None, mi
                     others same as DecisionTreeClassifier
                     
                     
+主成分分析：from sklearn.decomposition import PCA
+PCA(n_components=None, copy=True, whiten=False, svd_solver=’auto’, tol=0.0, iterated_power=’auto’, random_state=None)
+parameters:
+    n_components:int, float, None or string,Number of components to keep.要保留特征数量。
+    copy : bool (default True)，If False, data passed to fit are overwritten and running fit(X).transform(X) will not yield the expected results, use fit_transform(X) instead.如果为False,则用来拟合的数据被重写，运行fit(X).transform(X)不会生成预想的结果，要使用fit_transform(X)。
+    whiten : bool, optional (default False)，
+    svd_solver : string {‘auto’, ‘full’, ‘arpack’, ‘randomized’}，
+    iterated_power : int >= 0, or ‘auto’, (default ‘auto’)，Number of iterations for the power method computed by svd_solver == ‘randomized’.
+
+
+from sklearn.manifold import MDS(n_components=2, dissimilarity='precomputed')
+    n_components:要保留特征数量。
+    dissimilarity:设置为precomputed处理距离矩阵，来还原距离矩阵。
+    
+sklearn.metrics.pairwise_distances_argmin(X, Y, axis=1, metric=’euclidean’, batch_size=500, metric_kwargs=None)
+    return：
+        argmin : numpy.ndarray，Y[argmin[i], :] is the row in Y that is closest to X[i, :].
+

@@ -1,0 +1,11 @@
+scipy.status.mode()
+    a = np.array([[6, 8, 3, 0],
+              [3, 2, 1, 7],
+              [8, 1, 8, 4],
+              [5, 3, 0, 5],
+              [4, 7, 5, 9]])
+    stats.mode(a)每列的众数，如果没有则最小值及其出现次数
+    (array([[3, 1, 0, 0]]), array([[1, 1, 1, 1]]))
+    要获得整个数组的mode则指定axis=None
+    stats.mode(a, axis=None)
+    (array([3]), array([3]))
